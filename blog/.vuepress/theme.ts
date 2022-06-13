@@ -15,9 +15,11 @@ export default hopeTheme({
 
   docsDir: "demo/src",
 
+  lastUpdatedText: "上次编辑于",
+
   // navbar
   navbar: navbar,
-
+  
   // sidebar
   sidebar: "heading",
 
