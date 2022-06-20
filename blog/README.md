@@ -6,7 +6,7 @@ title: 首页
 heroFullScreen: false
 projects:
   - icon: project
-    name: 项目名称
+    name: 项目名称1
     desc: 项目详细描述
     link: https://你的项目链接
 
