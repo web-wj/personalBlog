@@ -25,5 +25,5 @@ projects:
     desc: 文章详细描述
     link: https://你的文章链接
 
-footer: Alex Wang 2021 - 2022 
+footer: Alex Wang 2021 - ~
 ---
