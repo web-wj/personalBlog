@@ -1,3 +1,10 @@
+---
+category:
+  - frontend
+tag:
+  - minPrograms
+---
+
 # navigation bar 和 tab bar
 
 Author: Tim Jing
