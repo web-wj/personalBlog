@@ -2,7 +2,7 @@ import { hopeTheme } from "vuepress-theme-hope";
 import navbar from "./navbar";
 
 export default hopeTheme({
-  hostname: "https://vuepress-theme-hope-v2-demo.mrhope.site",
+  hostname: "https://baidu.com",
 
   author: {
     name: "Alex Wang",
@@ -26,6 +26,8 @@ export default hopeTheme({
   footer: "默认页脚",
 
   displayFooter: true,
+  
+  updateTime: true,
 
   pageInfo: ["Author", "Original", "Date", "Category", "Tag", "ReadingTime"],
 
@@ -33,13 +35,10 @@ export default hopeTheme({
     description: "前端开发者",
     intro: "/intro.html",
     medias: {
-      Baidu: "https://example.com",
-      Dingding: "https://example.com",
       Email: "https://example.com",
-      Gitee: "https://example.com",
-      GitHub: "https://example.com",
-      Gitlab: "https://example.com",
-      QQ: "https://example.com",
+      Gitee: "https://gitee.com/web_wj001",
+      GitHub: "https://github.com/web-wj",
+      QQ: "451959831",
       Steam: "https://example.com",
       Wechat: "https://example.com",
       Weibo: "https://example.com",
@@ -50,6 +49,7 @@ export default hopeTheme({
   plugins: {
     blog: {
       autoExcerpt: true,
+      timeline: "true",
     },
 
     mdEnhance: {
