@@ -19,7 +19,7 @@ export default hopeTheme({
 
   // navbar
   navbar: navbar,
-  
+
   // sidebar
   sidebar: "heading",
 
