@@ -26,30 +26,25 @@ export default hopeTheme({
   footer: "默认页脚",
 
   displayFooter: true,
-  
+
   updateTime: true,
+
+  contributor: true,
 
   pageInfo: ["Author", "Original", "Date", "Category", "Tag", "ReadingTime"],
 
   blog: {
-    description: "前端开发者",
-    intro: "/intro.html",
+    description: "前端开发者，使用 vue、uniapp 等技术框架",
+    intro: "/about/",
     medias: {
-      Email: "https://example.com",
       Gitee: "https://gitee.com/web_wj001",
       GitHub: "https://github.com/web-wj",
-      QQ: "451959831",
-      Steam: "https://example.com",
-      Wechat: "https://example.com",
-      Weibo: "https://example.com",
-      Zhihu: "https://example.com",
     },
   },
 
   plugins: {
     blog: {
       autoExcerpt: true,
-      timeline: "true",
     },
 
     mdEnhance: {
