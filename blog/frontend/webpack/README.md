@@ -218,6 +218,123 @@ module.exports='b';
 - chunkname：chunk 的名称，如果没有配置则使用 main
 - id：通常指 chunk 的唯一编号，如果在开发环境下构建，和chunkname 相同；如果是生产环境下构建，则使用一个从 0 开始的数字进行编号
  
+## 入口和出口
 
+- 入口配置的是 chunk
 
-        
+### output
+
+- path 绝对路径，默认是 dist 
+- filename 生成文件的规则
+  - [name] chunkname
+  - [hash] 生成的总 hash 值
+  - [chunkhash:5] chunk 对应的 hash 值
+  - [id] 开发环境是 name 生产环境是数字
+
+### 最佳实践
+
+#### 一个页面一个 js
+
+- 源码结构： 
+  ```js
+  src
+    - pageA
+      - index.js
+    - pageB 
+      - index.js
+    - pageC
+      - main.js   主功能
+      - main2.js  额外功能
+    - common 公共目录
+      - ...
+  ```
+
+- webpack:
+  ```js
+  module.exports = {
+    entry: {
+      pageA: './src/pageA/index.js',
+      pageB: './src/pageB/index.js'
+      pageC: ['./src/pageC/main.js', './src/pageC/main2.js'],
+    },
+    output: {
+      path: path.resolve(__dirname, 'dist'), 
+      // 配置合并 js 文件的规则
+      filename: "[name]-[chunkhash:5].js"
+    }
+  }
+  ```
+
+适用于重复代码较少的情况，只会影响传输请求。那么为什么不能打包一个 common chunk 呢？
+
+- 原因在于打包后的模块是单独的作用域的。而且由于依赖关系，原来的模块打包的代码中也是包含 common 的代码的。
+ 
+#### 一个页面多个 js
+
+- 源码结构： 
+  ```js
+  src
+    - pageA
+      - index.js
+    - pageB 
+      - index.js
+    - statistics 用于统计访问人数功能
+      - index.js
+    - common 公共目录
+      - ...
+  ```
+
+  - webpack:
+  ```js
+  module.exports = {
+    entry: {
+      pageA: './src/pageA/index.js',
+      pageB: './src/pageB/index.js',
+      statistics: './src/statistics/index.js'
+    output: {
+      path: path.resolve(__dirname, 'dist'), 
+      // 配置合并 js 文件的规则
+      filename: "[name]-[chunkhash:5].js"
+    }
+  }
+  ```
+
+模块间不依赖，完全独立，就可以单独开一个 chunk 。
+
+#### 单页应用
+
+- 源码结构： 
+  ```js
+  src
+    - sunFunc  子功能
+      - index.js
+    - sunFunc  子功能
+      - index.js
+    - common  公共目录
+      - ...
+  ```
+
+  - webpack:
+  ```js
+  module.exports = {
+    entry: {
+      main: './src/index.js',
+    output: {
+      path: path.resolve(__dirname, 'dist'), 
+      // 配置合并 js 文件的规则
+      filename: "[name]-[hash:5].js"
+    }
+  }
+  ```
+
+## loader
+
+> 本质是一个函数，它的作用是将某个源码字符串换成另一个源码字符串返回。
+
+读取文件内容，分析语法树之前，会处理 loaders 。
+
+- 当前模块是否满足 loader 处理条件。
+- 否，生成空数组，直接做语法树分析。是，读取 loaders 数组，
+  依次处理。
+
+  ![](./imgs/loaders.png)
