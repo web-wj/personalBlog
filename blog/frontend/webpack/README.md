@@ -132,7 +132,45 @@ const modules = {
 
 #### 2.构建所有依赖模块
 
-- ![](imgs/chunks.png)
+ ![](imgs/chunks.png)
+
+```js
+// ./src/index.js
+console.log('index');
+require('./a.js');
+require('./b.js');
+
+// ./src/a.js
+require('./b.js');
+console.log('a');
+module.exports='a'; 
+
+// ./src/b.js
+console.log('b');
+module.exports='b'; 
+```
+- ./src/index.js 出发，dependencies 中保存 `['./src/a.js', './src/b.js']` , `['./src/b.js']` 
+- 替换依赖函数
+  
+```js
+// 模块id : ./src/index.js
+// 转化后的代码
+console.log('index');
+__webpack_require__('./src/a.js');
+__webpack_require__('./src/b.js');
+
+// 模块id : ./src/a.js
+// 转化后的代码
+__webpack_require__('./b.js');
+console.log('a');
+module.exports='a'; 
+
+// 模块id : ./src/b.js
+// 转化后的代码
+console.log('b');
+module.exports='b'; 
+```
+- 保存生成后的列表
 
   > AST在线测试工具：https://astexplorer.net/
 
@@ -142,12 +180,12 @@ const modules = {
 
 #### 3.产生chunk assets
 
-- 在第二步完成后，chunk 中会产生一个模块列表，列表中包含了模块id 和模块转换后的代码。
+- 在第二步完成后，chunk 中会产生一个模块列表，列表中包含了模块 id 和模块转换后的代码。 
 - 接下来，webpack 会根据配置为 chunk 生成一个资源列表，即 chunk assets，资源列表可以理解为是生成到最终文件的文件名和文件内容。
   
   ![](imgs/chunk-assets.png)
 
-  > chunk hash 是根据所有 chunk assets 的内容生成的一个 hash字符串 hash：一种算法，具体有很多分类，特点是将一个任意长度的字符串转换为一个固定长度的字符串，而且可以保证原始内容不变，产生的 hash 字符串就不变。
+  > chunk hash 是根据所有 chunk assets 的内容生成的一个 hash 字符串。  hash：一种算法，具体有很多分类，特点是将一个任意长度的字符串转换为一个固定长度的字符串，而且可以保证原始内容不变，产生的 hash 字符串就不变。
 
 - 简图：
 
@@ -159,7 +197,7 @@ const modules = {
 
   ![](imgs/chunk-hash.png)
 
-### 输出
+### 输出 emit
 
 此步骤非常简单，webpack 将利用 node 中的 fs 模块，根据编译产生的总的 assets ，生成相应的文件。
 
@@ -179,6 +217,7 @@ const modules = {
 - chunkhash：chunk 生成的资源清单内容联合生成的 hash 值
 - chunkname：chunk 的名称，如果没有配置则使用 main
 - id：通常指 chunk 的唯一编号，如果在开发环境下构建，和chunkname 相同；如果是生产环境下构建，则使用一个从 0 开始的数字进行编号
+ 
 
 
-
+        
