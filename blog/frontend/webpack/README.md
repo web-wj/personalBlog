@@ -331,10 +331,94 @@ module.exports='b';
 
 > 本质是一个函数，它的作用是将某个源码字符串换成另一个源码字符串返回。
 
-读取文件内容，分析语法树之前，会处理 loaders 。
+读取文件内容，分析语法树之前，会处理 loaders 。在打包过程中执行，所以不直接支持 es6 module （需要做特殊的处理）。
 
 - 当前模块是否满足 loader 处理条件。
 - 否，生成空数组，直接做语法树分析。是，读取 loaders 数组，
   依次处理。
 
   ![](./imgs/loaders.png)
+
+- 使用插件 loader-utils 来获取传递的参数。
+
+- 从上往下解析匹配，但是从下往上，从右往左运行！ ！！
+  ```js
+  module: {
+        rules: [
+          // 从上往下匹配，但是从下往上运行
+            {
+                test: /test-loader\.js$/, //正则表达式，匹配模块的路径
+                use: ["./loaders/test-loader.js?changeVal=未知数", "./loaders/loader1.js"]
+                  // options: {
+                  //     changeVal: "未知数"
+                  // }
+                 //匹配到了之后，使用哪些加载器
+            }, //规则1
+            {
+                test: /test-loader\.js$/, //正则表达式，匹配模块的路径
+                use: ["./loaders/loader1.js", "./loaders/loader2.js"] //匹配到了之后，使用哪些加载器
+            } //规则2
+        ], //模块的匹配规则
+    }
+  ```
+
+### 样式、图片处理
+
+  
+```js
+// 自定义的 loaders
+// 样式处理
+module.exports = function(sourceCode){
+  return `
+    const styleLabel = document.createElement('style');
+    styleLabel.innerHTML = \`${sourceCode}\`;
+    document.head.appendChild(styleLabel);
+    module.exports=\`${sourceCode}\`;
+    `;
+}
+
+// 图片处理
+var loaderUtil = require("loader-utils")
+
+function loader(buffer) { //给的是buffer
+    console.log("文件数据大小：(字节)", buffer.byteLength);
+    var { limit = 1000, filename = "[contenthash].[ext]" } = loaderUtil.getOptions(this);
+    if (buffer.byteLength >= limit) {
+        var content = getFilePath.call(this, buffer, filename);
+        content = "../dist/" + content;
+    }
+    else{
+        var content = getBase64(buffer)
+    }
+    return `module.exports = \`${content}\``;
+}
+
+loader.raw = true; //该loader要处理的是原始数据
+
+module.exports = loader;
+
+function getBase64(buffer) {
+    return "data:image/png;base64," + buffer.toString("base64");
+}
+
+function getFilePath(buffer, name) {
+    var filename = loaderUtil.interpolateName(this, name, {
+        content: buffer
+    });
+    this.emitFile(filename, buffer);
+    return filename;
+}
+
+// index.js 中的内容
+// 处理样式
+const content = require('./assets/style.css');
+console.log(content); 
+
+// 处理图片
+var src = require("./assets/webpack.png")
+console.log(src);
+var img = document.createElement("img")
+img.src = src;
+document.body.appendChild(img);
+```
+
