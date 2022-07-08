@@ -1,32 +1,32 @@
-# webpack 
+# webpack
 
 ## 如何在浏览器端实现模块化？
 
 ### 问题
 
 - 效率问题：精细的模块划分带来了更多的 js 文件，更多的 js 文件带来了更多的请求，降低了页面访问效率。
-- 兼容性问题：浏览器只支持 es6 模块化，不支持 CommonJS(第三方模块，例如：axios)   
+- 兼容性问题：浏览器只支持 es6 模块化，不支持 CommonJS(第三方模块，例如：axios)
 - 工具问题：浏览器不直接支持 npm 下载的第三方包
 - (非业务类)工程问题......
 
 > 根本原因是在 node 端，可以本地读取文件，效率比浏览器远程传输文件高的多。在浏览器端开发时态(devtime)和运行态(runtime)的侧重点不同。
 
 - 开发时态
-  - 支持多模块标准 es6、CommonJS
-  - 模块划分精细一点
-  - 不考虑兼容性问题
+    - 支持多模块标准 es6、CommonJS
+    - 模块划分精细一点
+    - 不考虑兼容性问题
 - 运行时态
-  - 文件少一点（合并多个相同类型文件）
-  - 体积小一点（代码别换行了，名称简写）
-  - 代码内容乱一点（别人看不懂代码）
-  - 执行效率问题
+    - 文件少一点（合并多个相同类型文件）
+    - 体积小一点（代码别换行了，名称简写）
+    - 代码内容乱一点（别人看不懂代码）
+    - 执行效率问题
 
 ### 解决办法
 
-- webpack 构建工具 
-- grunt gulp fis browserify ...... 
+- webpack 构建工具
+- grunt gulp fis browserify ......
 
-> 官网：https://www.webpackjs.com/  
+> 官网：https://www.webpackjs.com/
 
 基于 nodeJs ,以开发时态的一个入口文件，分析模块的依赖关系（利用模块化导入语句 ），经过一系列的过程（压缩合并），最终生成运行时态的文件。
 
@@ -63,7 +63,7 @@ const modules = {
     return module.exports;
   }
   // 执行入口模块
-  require('./src/index.js');  
+  require('./src/index.js');
 })({
   "./src/a.js": function(module, exports, require) {
     // xxx;
@@ -78,7 +78,7 @@ const modules = {
 ```
 
 - 为什么使用 eval 函数？
-  - 便于定位错误信息。简易版 source map 。
+    - 便于定位错误信息。简易版 source map 。
 
 ## 配置文件
 
@@ -94,20 +94,20 @@ const modules = {
 
 ### devtool 配置
 
-- source map 
+- source map
 - webpack 中的 source map
 
-  - 希望看到源码中的错误，而不是打包后的文件中的错误。chrome 率先支持了 source map 。没有兼容性问题，因为是开发者调试用的。。。
-  - 多一个配置文件，浏览器发现 source map ,会找这个配置文件，文件中记录了原始代码以及转化后的代码的对应关系。
-  - 不应在生产环境使用，source map 文件比较大，不仅会导致额外的网络传输，还会暴露原始代码。要调试真实的生产环境的代码，也需要做一些规避网络传输和代码暴露的问题。
+    - 希望看到源码中的错误，而不是打包后的文件中的错误。chrome 率先支持了 source map 。没有兼容性问题，因为是开发者调试用的。。。
+    - 多一个配置文件，浏览器发现 source map ,会找这个配置文件，文件中记录了原始代码以及转化后的代码的对应关系。
+    - 不应在生产环境使用，source map 文件比较大，不仅会导致额外的网络传输，还会暴露原始代码。要调试真实的生产环境的代码，也需要做一些规避网络传输和代码暴露的问题。
 
 ## 编译过程
 
 - 整个过程大致分为三个步骤：
-  - 初始化
-  - 编译
-  - 输出
-  
+    - 初始化
+    - 编译
+    - 输出
+
 ![](imgs/progress.png)
 
 ### 初始化
@@ -123,12 +123,12 @@ const modules = {
 
 - chunk 是 webpack 在内部构建过程中的一个概念，译为块，它表示通过某个入口找到的所有依赖的统称。
 - 根据入口模块（默认为./src/index.js）创建一个 chunk 。
-  
+
   ![](imgs/main-chunk.png)
 
 - 每个 chunk 都有至少两个属性：
-  - name：默认为 main
-  - id：唯一编号，开发环境和 name 相同，生产环境是一个数字，从0 开始
+    - name：默认为 main
+    - id：唯一编号，开发环境和 name 相同，生产环境是一个数字，从0 开始
 
 #### 2.构建所有依赖模块
 
@@ -143,15 +143,16 @@ require('./b.js');
 // ./src/a.js
 require('./b.js');
 console.log('a');
-module.exports='a'; 
+module.exports='a';
 
 // ./src/b.js
 console.log('b');
-module.exports='b'; 
+module.exports='b';
 ```
-- ./src/index.js 出发，dependencies 中保存 `['./src/a.js', './src/b.js']` , `['./src/b.js']` 
+
+- ./src/index.js 出发，dependencies 中保存 `['./src/a.js', './src/b.js']` , `['./src/b.js']`
 - 替换依赖函数
-  
+
 ```js
 // 模块id : ./src/index.js
 // 转化后的代码
@@ -163,13 +164,14 @@ __webpack_require__('./src/b.js');
 // 转化后的代码
 __webpack_require__('./b.js');
 console.log('a');
-module.exports='a'; 
+module.exports='a';
 
 // 模块id : ./src/b.js
 // 转化后的代码
 console.log('b');
-module.exports='b'; 
+module.exports='b';
 ```
+
 - 保存生成后的列表
 
   > AST在线测试工具：https://astexplorer.net/
@@ -180,9 +182,9 @@ module.exports='b';
 
 #### 3.产生chunk assets
 
-- 在第二步完成后，chunk 中会产生一个模块列表，列表中包含了模块 id 和模块转换后的代码。 
+- 在第二步完成后，chunk 中会产生一个模块列表，列表中包含了模块 id 和模块转换后的代码。
 - 接下来，webpack 会根据配置为 chunk 生成一个资源列表，即 chunk assets，资源列表可以理解为是生成到最终文件的文件名和文件内容。
-  
+
   ![](imgs/chunk-assets.png)
 
   > chunk hash 是根据所有 chunk assets 的内容生成的一个 hash 字符串。  hash：一种算法，具体有很多分类，特点是将一个任意长度的字符串转换为一个固定长度的字符串，而且可以保证原始内容不变，产生的 hash 字符串就不变。
@@ -217,30 +219,31 @@ module.exports='b';
 - chunkhash：chunk 生成的资源清单内容联合生成的 hash 值
 - chunkname：chunk 的名称，如果没有配置则使用 main
 - id：通常指 chunk 的唯一编号，如果在开发环境下构建，和chunkname 相同；如果是生产环境下构建，则使用一个从 0 开始的数字进行编号
- 
+
 ## 入口和出口
 
 - 入口配置的是 chunk
 
 ### output
 
-- path 绝对路径，默认是 dist 
+- path 绝对路径，默认是 dist
 - filename 生成文件的规则
-  - [name] chunkname
-  - [hash] 生成的总 hash 值
-  - [chunkhash:5] chunk 对应的 hash 值
-  - [id] 开发环境是 name 生产环境是数字
+    - [name] chunkname
+    - [hash] 生成的总 hash 值
+    - [chunkhash:5] chunk 对应的 hash 值
+    - [id] 开发环境是 name 生产环境是数字
 
 ### 最佳实践
 
 #### 一个页面一个 js
 
-- 源码结构： 
+- 源码结构：
+
   ```js
   src
     - pageA
       - index.js
-    - pageB 
+    - pageB
       - index.js
     - pageC
       - main.js   主功能
@@ -250,6 +253,7 @@ module.exports='b';
   ```
 
 - webpack:
+
   ```js
   module.exports = {
     entry: {
@@ -258,7 +262,7 @@ module.exports='b';
       pageC: ['./src/pageC/main.js', './src/pageC/main2.js'],
     },
     output: {
-      path: path.resolve(__dirname, 'dist'), 
+      path: path.resolve(__dirname, 'dist'),
       // 配置合并 js 文件的规则
       filename: "[name]-[chunkhash:5].js"
     }
@@ -268,15 +272,16 @@ module.exports='b';
 适用于重复代码较少的情况，只会影响传输请求。那么为什么不能打包一个 common chunk 呢？
 
 - 原因在于打包后的模块是单独的作用域的。而且由于依赖关系，原来的模块打包的代码中也是包含 common 的代码的。
- 
+
 #### 一个页面多个 js
 
-- 源码结构： 
+- 源码结构：
+
   ```js
   src
     - pageA
       - index.js
-    - pageB 
+    - pageB
       - index.js
     - statistics 用于统计访问人数功能
       - index.js
@@ -284,7 +289,8 @@ module.exports='b';
       - ...
   ```
 
-  - webpack:
+    - webpack:
+
   ```js
   module.exports = {
     entry: {
@@ -292,7 +298,7 @@ module.exports='b';
       pageB: './src/pageB/index.js',
       statistics: './src/statistics/index.js'
     output: {
-      path: path.resolve(__dirname, 'dist'), 
+      path: path.resolve(__dirname, 'dist'),
       // 配置合并 js 文件的规则
       filename: "[name]-[chunkhash:5].js"
     }
@@ -303,7 +309,8 @@ module.exports='b';
 
 #### 单页应用
 
-- 源码结构： 
+- 源码结构：
+
   ```js
   src
     - sunFunc  子功能
@@ -314,13 +321,14 @@ module.exports='b';
       - ...
   ```
 
-  - webpack:
+    - webpack:
+
   ```js
   module.exports = {
     entry: {
       main: './src/index.js',
     output: {
-      path: path.resolve(__dirname, 'dist'), 
+      path: path.resolve(__dirname, 'dist'),
       // 配置合并 js 文件的规则
       filename: "[name]-[hash:5].js"
     }
@@ -342,6 +350,7 @@ module.exports='b';
 - 使用插件 loader-utils 来获取传递的参数。
 
 - 从上往下解析匹配，但是从下往上，从右往左运行！ ！！
+
   ```js
   module: {
         rules: [
@@ -363,7 +372,7 @@ module.exports='b';
   ```
 
 ### 样式、图片处理
-  
+
 ```js
 // 自定义的 loaders
 // 样式处理
@@ -411,7 +420,7 @@ function getFilePath(buffer, name) {
 // index.js 中的内容
 // 处理样式
 const content = require('./assets/style.css');
-console.log(content); 
+console.log(content);
 
 // 处理图片
 var src = require("./assets/webpack.png")
@@ -438,7 +447,7 @@ plugin的**本质**是一个带有apply方法的对象。
 ```js
 var plugin = {
     apply: function(compiler){
-        
+
     }
 }
 ```
@@ -504,4 +513,3 @@ class MyPlugin{
 **处理函数**
 
 处理函数有一个事件参数`compilation`
-
