@@ -503,5 +503,36 @@ class MyPlugin{
 
 **处理函数**
 
-处理函数有一个事件参数`compilation`
+处理函数有一个事件参数`compilation`。
 
+## 配置细节 - 细枝末节
+
+- 配置文件如果导出一个函数，则会将返回结果作为配置对象。可以通过命令指定环境,通过一个配置文件配置多个环境。`webpack --env='xxx'`
+- context: 会影响入口和 loader 的路径配置基础。
+- `output: { library, libraryTarget }` 打包结果立即执行函数结果会暴露给 library 规定的 变量。
+  - 和插件一起配合得到打包结果。
+  - 写的不是一个工程，是一个 库，类似于 jquery ，希望别人使用 $ 等全局变量。
+  - libraryTarget 更精细控制导出。
+- `target: "web"` 打包结果执行的环境，默认是 web 。还可以设置 node 。
+- `module: { noParse: /jquery/ }` 不用解析，例如针对 jquery 等大型的**单模块库**（已经打包过的，没有其他依赖），来提高构建效率，和运行时没有任何关系，呵呵了！
+- ```js
+  resolve: {  
+    // modules 模块的查找位置
+    modules: ["node_modules"],
+    // require("./a") webapck 会从 extensions 中补全后缀
+    extensions: [".js", ".json"],
+    // 别名，这个比较高频使用！！
+    alias: {
+      "@": path.resolve(__dirname, 'src'),
+      "_": __dirname,
+    }
+  }
+  ```
+- ```js
+  // 通过 cdn 引入了,遇到哪个包不用管,替换为导出一个 $ _
+  externals: {
+    jquery: "$",
+    lodash: "_",
+  }
+  ```
+- `stats` webpack 执行后控制台的输出内容。
